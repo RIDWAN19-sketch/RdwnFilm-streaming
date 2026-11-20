@@ -41,13 +41,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initEventListeners() {
     // Navbar transparent to solid on scroll
+    let scrollTicking = false;
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 40) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    });
+        if (scrollTicking) return;
+        scrollTicking = true;
+        requestAnimationFrame(() => {
+            navbar.classList.toggle('scrolled', window.scrollY > 40);
+            scrollTicking = false;
+        });
+    }, { passive: true });
 
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
@@ -106,6 +108,7 @@ function setActiveNav(activeLink) {
 }
 
 async function handleRouting() {
+    if (!window.rdwnCurrentUser) return;
     const hash = window.location.hash;
     countryPills.style.display = 'none';
 
@@ -159,16 +162,21 @@ function showView(viewName) {
 }
 
 /* ================= STORAGE: DAFTAR SAYA & LANJUTKAN MENONTON ================= */
+function userStorageKey(key) {
+    const uid = window.rdwnCurrentUser?.uid || 'guest';
+    return `${key}_${uid}`;
+}
+
 function getStoredList(key) {
     try {
-        return JSON.parse(localStorage.getItem(key)) || [];
+        return JSON.parse(localStorage.getItem(userStorageKey(key))) || [];
     } catch {
         return [];
     }
 }
 
 function saveStoredList(key, list) {
-    localStorage.setItem(key, JSON.stringify(list));
+    localStorage.setItem(userStorageKey(key), JSON.stringify(list));
 }
 
 function isInMyList(id) {
@@ -461,7 +469,7 @@ function renderMovieGrid(movies) {
     movieGrid.innerHTML = movies.map(movie => createMovieCardHTML(movie)).join('');
 }
 
-/* ================= DETAIL FILM + TRAILER + REKOMENDASI ================= */
+/* ================= DETAIL FILM + REKOMENDASI ================= */
 async function loadMovieDetail(id) {
     views.detail.innerHTML = '<div class="loading" style="padding-top: 8rem;">Memuat detail film...</div>';
     try {
@@ -485,7 +493,6 @@ async function loadMovieDetail(id) {
         const countries = movie.production_countries ? movie.production_countries.map(c => c.name).join(', ') : '-';
         const saved = isInMyList(movie.id);
 
-        const trailer = (movie.videos || []).find(v => v.site === 'YouTube' && (v.type === 'Trailer' || v.type === 'Teaser'));
         const safeMovieData = JSON.stringify({
             id: movie.id,
             title: movie.title,
@@ -521,14 +528,6 @@ async function loadMovieDetail(id) {
                                 </button>
                             </div>
 
-                            ${trailer ? `
-                                <div class="trailer-section">
-                                    <h3>🎬 Trailer Resmi</h3>
-                                    <div class="trailer-box">
-                                        <iframe src="https://www.youtube.com/embed/${trailer.key}" allowfullscreen frameborder="0"></iframe>
-                                    </div>
-                                </div>
-                            ` : ''}
                         </div>
                     </div>
 
@@ -621,3 +620,6 @@ function changeServer(index) {
         btn.classList.toggle('active', idx === index);
     });
 }
+
+
+/* Autentikasi dipisahkan ke /auth.js agar app.js fokus pada fitur film. */
