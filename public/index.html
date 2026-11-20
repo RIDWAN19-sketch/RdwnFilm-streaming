@@ -10,6 +10,49 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+    <!-- Autentikasi wajib sebelum mengakses katalog -->
+    <section id="auth-screen" class="auth-screen" aria-live="polite">
+        <div class="auth-panel">
+            <a class="logo auth-logo" href="#">RdwnFilm</a>
+            <h1 id="auth-title">Masuk untuk melanjutkan</h1>
+            <p class="auth-subtitle">Gunakan akun Google, email, username, atau nomor telepon.</p>
+            <button id="google-signin" class="google-btn" type="button">G  Lanjutkan dengan Google</button>
+            <div class="auth-divider"><span>atau</span></div>
+            <form id="email-auth-form">
+                <label for="auth-identifier">Email atau username</label>
+                <input id="auth-identifier" autocomplete="username" placeholder="Email atau username" required>
+                <div id="signup-email-wrap" hidden>
+                    <label for="signup-email">Alamat email</label>
+                    <input id="signup-email" type="email" autocomplete="email" placeholder="nama@email.com">
+                </div>
+                <div id="signup-username-wrap" hidden>
+                    <label for="signup-username">Username</label>
+                    <input id="signup-username" autocomplete="username" minlength="3" maxlength="20" placeholder="Buat username">
+                </div>
+                <label for="auth-password">Kata sandi</label>
+                <input id="auth-password" type="password" autocomplete="current-password" minlength="6" placeholder="Kata sandi" required>
+                <button id="email-auth-submit" class="auth-submit" type="submit">Masuk</button>
+            </form>
+            <div class="auth-switch">
+                <span id="auth-switch-text">Belum punya akun?</span>
+                <button id="auth-mode-toggle" type="button">Daftar sekarang</button>
+            </div>
+            <div class="auth-divider"><span>atau masuk dengan nomor telepon</span></div>
+            <div id="phone-recaptcha"></div>
+            <div class="phone-row">
+                <input id="phone-number" type="tel" autocomplete="tel" placeholder="+628xxxxxxxxxx">
+                <button id="send-otp" type="button">Kirim OTP</button>
+            </div>
+            <div id="otp-wrap" hidden>
+                <input id="phone-otp" inputmode="numeric" autocomplete="one-time-code" placeholder="Kode OTP">
+                <button id="verify-otp" type="button">Verifikasi</button>
+            </div>
+            <p id="auth-message" class="auth-message" role="status"></p>
+            <p class="auth-legal">Dengan melanjutkan, Anda menyetujui ketentuan penggunaan layanan.</p>
+        </div>
+    </section>
+
+    <div id="site-shell" hidden>
     <!-- Navbar Transparan Dinamis -->
     <header class="navbar" id="navbar">
         <div class="nav-container">
@@ -107,6 +150,11 @@
         <p>© 2026 <strong>RdwnFilm</strong> — Tampilan & Fitur Streaming Modern. Data film didukung oleh TMDB.</p>
     </footer>
 
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+    <script src="/auth.js"></script>
     <script src="/app.js"></script>
 </body>
 </html>
