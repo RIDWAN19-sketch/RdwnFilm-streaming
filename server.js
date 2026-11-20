@@ -6,6 +6,7 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
+app.use(express.json());
 
 // Security Headers
 app.use((req, res, next) => {
@@ -13,8 +14,9 @@ app.use((req, res, next) => {
   next();
 });
 
+
 // TMDB API Config
-const TMDB_KEY  = process.env.TMDB_KEY || '4f599baa15d072c9de346b2816a131b8';
+const TMDB_KEY  = '4f599baa15d072c9de346b2816a131b8'; // TMDB key bawaan website
 const TMDB_BASE = 'https://api.tmdb.org/3';
 
 async function fetchTMDB(endpoint, query = {}) {
@@ -140,14 +142,12 @@ app.get('/api/movies/country/:code', async (req, res) => {
 app.get('/api/movies/detail/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const [detail, videos, recommendations] = await Promise.all([
+    const [detail, recommendations] = await Promise.all([
       fetchTMDB(`/movie/${id}`),
-      fetchTMDB(`/movie/${id}/videos`, { language: 'en-US' }),
       fetchTMDB(`/movie/${id}/recommendations`)
     ]);
     res.json({
       ...detail,
-      videos: videos.results || [],
       recommendations: (recommendations.results || []).filter(m => m.poster_path).slice(0, 12)
     });
   } catch (e) { res.status(500).json({ error: 'Gagal memuat detail film' }); }
